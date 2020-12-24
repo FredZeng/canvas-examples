@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="640" height="360"></canvas>
+    <div style="margin-top: 16px;">
+      <button id="play">Play</button>
+      <button id="pause">Pause</button>
+    </div>
+    <script>
+      function Player(src, canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) {
+          throw new TypeError('canvasId not found!');
+        }
+        var rect = this.canvas.getBoundingClientRect();
+        this.width = rect.width;   // canvas width
+        this.height = rect.height; // canvas height
+        this.startX = 0;
+        this.videoW = 0; // video actual display width
+        this.videoH = 0; // video actual display height
+        this.initVideoSize = false;
+        this.context = this.canvas.getContext('2d');
+        this.video = document.createElement('video');
+        this.video.src = src;
+        this.playInterval = null;
+
+        this.video.addEventListener('ended', this.end.bind(this));
+      }
+
+      Player.prototype.play = function() {
+        var video = this.video;
+        if (!video.paused) {
+          return;
+        }
+        var that = this;
+        video.play().catch(function() {});
+        this.playInterval = setInterval(function() {
+          if (video.paused) {
+            return;
+          }
+          if (!that.initVideoSize) {
+            if (typeof video.videoWidth == 'number' && video.videoWidth !== 0) {
+              // resize video to fit canvas size
+              that.videoH = that.height;
+              that.videoW = video.videoWidth * (that.height / video.videoHeight);
+              that.startX = (that.width - that.videoW) / 2;
+              that.initVideoSize = true;
+            }
+          }
+          that.context.drawImage(video, that.startX, 0, that.videoW, that.videoH);
+        }, 16);
+      }
+
+      Player.prototype.pause = function() {
+        this.end();
+      }
+
+      Player.prototype.end = function() {
+        if (!this.video.paused) {
+          this.video.pause();
+        }
+        clearInterval(this.playInterval);
+      }
+
+      var player = new Player('http://vjs.zencdn.net/v/oceans.mp4', 'canvas');
+
+      document.getElementById('play').addEventListener('click', function() {
+        player.play();
+      });
+
+      document.getElementById('pause').addEventListener('click', function() {
+        player.pause();
+      });
+    </script>
+  </body>
+</html>
