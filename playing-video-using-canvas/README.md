@@ -17,4 +17,10 @@ var playInterval = setInterval(function() {
 }, 16);
 ```
 
+## References
+
+[MDN - Using images](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images)
+
+---
+
 [View full source](./index.html)
