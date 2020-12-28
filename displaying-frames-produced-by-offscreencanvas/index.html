@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <video controls src="http://vjs.zencdn.net/v/oceans.mp4" muted id="video"></video>
+    <canvas id="canvas" width="960" height="400"></canvas>
+
+    <script>
+      var ctx = document.getElementById('canvas').getContext('bitmaprenderer');
+      var video = document.getElementById('video');
+
+      var offscreen = new OffscreenCanvas(960, 400);
+      // var offscreenCtx = offscreen.getContext('webgl');
+      var offscreenCtx = offscreen.getContext('2d');
+
+      video.addEventListener('play', function() {
+        timerCallback();
+      });
+
+      function timerCallback() {
+        if (video.paused || video.ended) {
+          return;
+        }
+        syncFrame();
+        setTimeout(timerCallback, 16)
+      }
+
+      function syncFrame() {
+        offscreenCtx.drawImage(video, 0, 0);
+
+        var bitmap = offscreen.transferToImageBitmap();
+        ctx.transferFromImageBitmap(bitmap);
+      }
+    </script>
+  </body>
+</html>

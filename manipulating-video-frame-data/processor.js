@@ -44,7 +44,6 @@ let processor = {
       }
     }
     this.ctx2.putImageData(frame, 0, 0);
-    return;
   }
 };
 
